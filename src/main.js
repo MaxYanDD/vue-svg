@@ -1,6 +1,11 @@
 import Vue from "vue";
 import App from "./App.vue";
 import bindDocEvent from  './utils/doc'
+
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+Vue.use(ElementUI);
+
 // 将elements中的组件注册为全局
 const componentsContext = require.context(
   "./components/elements",

@@ -14,7 +14,6 @@
       :style ="option.style"
       @mousedown="mouseDownHandler" 
     />
-
   </g>
 </template>
 
@@ -28,9 +27,6 @@ export default {
     index:{
       type: Number
     },
-    // selectedIndex:{
-    //   type: Number
-    // }
   },
   data() {
     return {

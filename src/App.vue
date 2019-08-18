@@ -20,7 +20,7 @@ export default {
     ToolBar
   },
   methods: {
-
+    
   }
 };
 </script>

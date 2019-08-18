@@ -12,10 +12,9 @@
 
 <style lang="scss" scoped>
 .tool-bar{
-  width: 600px;
-  height: 45px;
-  border-bottom: 1px solid #ccc;
-  margin-bottom: 10px;
+  width: 100%;
+  height: 60px;
+  border-bottom: 1px solid rgba(0,0,0,.04);
   display: flex;
   justify-content: center;
 }
