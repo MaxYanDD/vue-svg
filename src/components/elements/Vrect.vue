@@ -1,64 +1,51 @@
 <template>
-<g>
-  <rect
-    @mousedown="mouseDownHandler"
-    @mouseup="mouseupHandler"
-    :x="x"
-    :y="y"
-    :width="width"
-    :height="height"
-    style="fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)"
-  />
+  <g>
+    <rect
+      :x="option.x"
+      :y="option.y"
+      :width="option.width"
+      :height="option.height"
+      :rx="option.rx"
+      :ry="option.ry"
+      :fill="option.fill"
+      :stroke="option.stroke"
+      :stroke-width="option['stroke-width'] || 0"
+      :transform="option.transform"
+      :style ="option.style"
+      @mousedown="mouseDownHandler" 
+    />
+
   </g>
 </template>
 
 <script>
 export default {
+  name:'Vrect',
   props: {
-    mousePos: {
+    option: {
       type: Object
-    }
+    },
+    index:{
+      type: Number
+    },
+    // selectedIndex:{
+    //   type: Number
+    // }
   },
   data() {
     return {
-      draggable:false,
+      draggable: false,
       width: 100,
       height: 200,
-      x: 0,
-      y: 0
+      x: 33,
+      y: 33
     };
   },
-  methods: {
-    mouseDownHandler(e) {
-      this.draggable = true;
-      this.initMsX = e.offsetX;
-      this.initMsY = e.offsetY;
-      this.initPosX = this.x;
-      this.initPosY = this.y;
-    },
-    mouseupHandler() {
-       this.draggable = false;
-    },
-    drag(newPos){
-      if(this.draggable){
-         this.x = this.initPosX + (newPos.x - this.initMsX);
-         this.y = this.initPosY + (newPos.y - this.initMsY);
-      }
-    },
-    stopDrag(){
-      this.draggable = false
+  methods:{
+    mouseDownHandler(){
+      if(this.option.type == 'hint') return;
+      this._bus.$emit('changeIndex',this.index);
     }
-  },
-  watch:{
-    mousePos:{
-      handler(newPos){
-         this.drag(newPos)
-      },
-      deep:true
-    }
-  },
-  create(){
-    this._bus.$on('app_mouse_up', this.stopDrag)
   }
 };
 </script>
