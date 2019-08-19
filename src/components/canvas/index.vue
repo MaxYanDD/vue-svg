@@ -44,7 +44,7 @@ export default {
           ry: 5,
           fill: "red",
           stroke: "yellow",
-          "stroke-width": 0,
+          strokeWidth: 10,
           transform: "",
           style: "cursor:move"
         },
@@ -59,7 +59,7 @@ export default {
           ry: 0,
           fill: "#ccc",
           stroke: "yellow",
-          "stroke-width": 0,
+          strokeWidth: 0,
           transform: "",
           style: "cursor:move"
         }
@@ -119,14 +119,14 @@ export default {
     setSvgHeight() {
       let max = 0;
       this.elements.forEach(op => {
-        if (op.y + op.height + op["stroke-width"] / 2 > max) {
-          max = op.y + op.height + op["stroke-width"] / 2;
+        if (op.y + op.height + op.strokeWidth / 2 > max) {
+          max = op.y + op.height + op.strokeWidth / 2;
         }
       });
       this.svgH = max;
     },
     updateSvgHeight() {
-      const { y, height, "stroke-width": strokeW } = this.elements[
+      const { y, height, strokeWidth: strokeW } = this.elements[
         this.dragIndex
       ];
       this.svgH =

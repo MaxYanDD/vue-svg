@@ -9,7 +9,7 @@
       :ry="option.ry"
       :fill="option.fill"
       :stroke="option.stroke"
-      :stroke-width="option['stroke-width'] || 0"
+      :stroke-width="option.strokeWidth || 0"
       :transform="option.transform"
       :stroke-dasharray="option.dasharray "
       :style ="option.style"
