@@ -11,6 +11,7 @@
       :stroke="option.stroke"
       :stroke-width="option['stroke-width'] || 0"
       :transform="option.transform"
+      :stroke-dasharray="option.dasharray "
       :style ="option.style"
       @mousedown="mouseDownHandler" 
     />
@@ -39,7 +40,10 @@ export default {
   },
   methods:{
     mouseDownHandler(){
-      if(this.option.type == 'hint') return;
+      if(this.option.type == 'hint') {
+        this._bus.$emit('resize',this.option.dr)
+        return
+      };
       this._bus.$emit('changeIndex',this.index);
     }
   }

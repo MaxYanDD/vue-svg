@@ -1,7 +1,8 @@
 <template>
-  <g @mousedown.stop>
+  <g>
+    <Vrect :option="hintStroke"/>
     <template v-for="(ele,index) in hintElments">
-      <component :is="ele.name" :key="index" :option="ele"></component>
+      <component :is="ele.name" :key="index" :option="ele" ></component>
     </template>
   </g>
 </template>
@@ -13,6 +14,8 @@ export default {
       //被选中的图像的option
       type: Object
     }
+  },
+  created(){
   },
   computed: {
     // 根据选择的元素，计算出hint的元素位置
@@ -38,17 +41,42 @@ export default {
         if(!rsw) rsw = 0;
         const l = x - (w/2) - (rsw/2),c = x + (rw)/2 - (w/2),r = x + rw - (w/2) + (rsw/2);
         const t = y - (h/2) - (rsw/2),m = y + (rh)/2 - (h/2),b = y + rh - (h/2) + (rsw/2);
-        elarr.push(Object.assign({},defaultStyle,{x: l,y: t,style: 'cursor: nw-resize;'})) //左上
-        elarr.push(Object.assign({},defaultStyle,{x: c,y: t,style: 'cursor: n-resize;'})) //中上
-        elarr.push(Object.assign({},defaultStyle,{x: r,y: t,style: 'cursor: ne-resize;'})) //右上
-        elarr.push(Object.assign({},defaultStyle,{x: l,y: m,style: 'cursor: w-resize;'})) //中左
-        elarr.push(Object.assign({},defaultStyle,{x: r,y: m,style: 'cursor: e-resize;'})) //中右
-        elarr.push(Object.assign({},defaultStyle,{x: l,y: b,style: 'cursor: sw-resize;'})) //下左
-        elarr.push(Object.assign({},defaultStyle,{x: c,y: b,style: 'cursor: s-resize;'})) //下中
-        elarr.push(Object.assign({},defaultStyle,{x: r,y: b,style: 'cursor: se-resize;'})) //下右
+        elarr.push(Object.assign({},defaultStyle,{x: l,y: t,dr:'lt',style: 'cursor: nw-resize;'})) //左上
+        elarr.push(Object.assign({},defaultStyle,{x: c,y: t,dr:'ct',style: 'cursor: n-resize;'})) //中上
+        elarr.push(Object.assign({},defaultStyle,{x: r,y: t,dr:'rt',style: 'cursor: ne-resize;'})) //右上
+        elarr.push(Object.assign({},defaultStyle,{x: l,y: m,dr:'lm',style: 'cursor: w-resize;'})) //中左
+        elarr.push(Object.assign({},defaultStyle,{x: r,y: m,dr:'rm',style: 'cursor: e-resize;'})) //中右
+        elarr.push(Object.assign({},defaultStyle,{x: l,y: b,dr:'lb',style: 'cursor: sw-resize;'})) //下左
+        elarr.push(Object.assign({},defaultStyle,{x: c,y: b,dr:'cb',style: 'cursor: s-resize;'})) //下中
+        elarr.push(Object.assign({},defaultStyle,{x: r,y: b,dr:'rb',style: 'cursor: se-resize;'})) //下右
       }
       return elarr;
+    },
+    hintStroke(){
+      let defaultStyle = {
+        name: "Vrect",
+        type: 'hint',
+        rx: 0,
+        ry: 0,
+        fill: "none",
+        stroke: "#0072fb",
+        'stroke-width':1,
+        dasharray: '5,5', 
+        transform: '',
+        style:'pointer-events: none'
+      }
+      const {x,y,width,height} = this.option
+
+      return Object.assign({},defaultStyle,{x,y,width,height})
+
     }
+  },
+  methods:{
+    mouseDownHandler(e){
+      this.mousePosX = e.clientX;
+      this.mousePosY = e.clientY;
+    },
+    
   }
 };
 </script>

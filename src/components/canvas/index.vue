@@ -1,40 +1,41 @@
 <template>
   <div class="canvas">
-    <svg :height="svgH" @mousemove="mouseMoveHandler" @mousedown="mouseDownHandler" @contextmenu.prevent="contextHandler" ref="svg" >
+    <svg
+      :height="svgH"
+      @mousemove="mouseMoveHandler"
+      @mousedown="mouseDownHandler"
+      @contextmenu.prevent="contextHandler"
+      ref="svg"
+    >
       <!-- 背景 -->
-      <g>
-
-      </g>
+      <g />
       <!-- 元素 -->
       <g>
         <template v-for="(ele,index) in elements">
-          <component
-            :is="ele.name"
-            :option="ele"
-            :index="index"
-            :key="index"
-          />
+          <component :is="ele.name" :option="ele" :index="index" :key="index" />
         </template>
       </g>
       <!-- 辅助 -->
       <template v-if="selectedIndex > -1">
-        <Hint :option="elements[selectedIndex]"/>
+        <Hint :option.sync="elements[selectedIndex]" />
       </template>
     </svg>
   </div>
 </template>
 
 <script>
-import Hint from './Hint'
+import Hint from "./Hint";
+import _reize from "../../utils/resize";
 export default {
   data() {
     return {
       svgH: 0,
       selectedIndex: -1,
+      resizeDr: "",
       elements: [
         {
           name: "Vrect",
-          type: 'rect',
+          type: "rect",
           width: 50,
           height: 50,
           x: 0,
@@ -46,67 +47,71 @@ export default {
           "stroke-width": 0,
           transform: "",
           style: "cursor:move"
-        },{
+        },
+        {
           name: "Vrect",
-          type: 'rect',
+          type: "rect",
           width: 100,
           height: 200,
           x: 100,
           y: 100,
           rx: 0,
           ry: 0,
+          fill: "#ccc",
           stroke: "yellow",
           "stroke-width": 0,
           transform: "",
           style: "cursor:move"
-        },{
-          name: "Vobject",
-          type: 'object',
-          width: 0,
-          height: 0,
-          x: 100,
-          y: 100,
         }
       ]
     };
   },
-  components: {Hint},
+  components: { Hint },
   methods: {
     mouseMoveHandler(e) {
       this.mousePosX = e.clientX;
       this.mousePosY = e.clientY;
+
+      if (this.resizeDr) {
+        this.resize(this.resizeDr);
+        this.updateSvgHeight()
+        return;
+      }
+
       if (this.dragIndex > -1) {
         this.drag();
+        return;
       }
     },
     mouseDownHandler(down_e) {
       // 记录mousedown的初始位置
       if (down_e.target == this.$refs["svg"]) {
         this.selectedIndex = -1;
-        return
-      };
+        return;
+      }
       this.dragIndex = this.selectedIndex;
-      const { x, y } = this.elements[this.dragIndex];
+      const { x, y,width,height } = this.elements[this.dragIndex];
       this.initX = x;
       this.initY = y;
+      this.initW = width;
+      this.initH = height;
       this.initmsX = this.mousePosX;
       this.initmsY = this.mousePosY;
     },
-    contextHandler(){
-
-    },
+    contextHandler() {},
     drag() {
       let x = this.initX + this.mousePosX - this.initmsX;
       let y = this.initY + this.mousePosY - this.initmsY;
       this.$set(
         this.elements,
         this.dragIndex,
-        Object.assign(this.elements[this.dragIndex], { x, y })
+        Object.assign({}, this.elements[this.dragIndex], { x, y })
       );
       this.updateSvgHeight();
     },
-    undrag() {
+    doc_mouse_up() {
       this.dragIndex = -1;
+      this.resizeDr = "";
     },
     changeIndex(index) {
       this.selectedIndex = index;
@@ -114,32 +119,51 @@ export default {
     setSvgHeight() {
       let max = 0;
       this.elements.forEach(op => {
-        if(op.y+op.height+op['stroke-width']/2 > max){
-          max = op.y + op.height + op['stroke-width']/2
+        if (op.y + op.height + op["stroke-width"] / 2 > max) {
+          max = op.y + op.height + op["stroke-width"] / 2;
         }
       });
       this.svgH = max;
     },
-    updateSvgHeight(){
-      console.log('updat');
-      
-      const {y,height,'stroke-width':strokeW } = this.elements[this.dragIndex];
-      this.svgH = (y+height+strokeW/2) > this.svgH ? (y+height+strokeW/2) : this.svgH;
+    updateSvgHeight() {
+      const { y, height, "stroke-width": strokeW } = this.elements[
+        this.dragIndex
+      ];
+      this.svgH =
+        y + height + strokeW / 2 > this.svgH
+          ? y + height + strokeW / 2
+          : this.svgH;
     },
-    add(){
-
+    add() {
       // 更新svg的高度
       this.updateSvgHeight();
+    },
+    resize(dr) {
+      const { width, height } = this.elements[this.dragIndex];
+      let newOption = _reize[dr]({
+        imsX: this.initmsX,
+        imsY: this.initmsY,
+        nmsX: this.mousePosX,
+        nmsY: this.mousePosY,
+        x: this.initX,
+        y: this.initY,
+        width:this.initW,
+        height:this.initH
+      });
+      this.$set(
+        this.elements,
+        this.dragIndex,
+        Object.assign({ ...this.elements[this.dragIndex] }, newOption)
+      );
     }
   },
   created() {
     this.setSvgHeight();
     this._bus.$on("changeIndex", this.changeIndex);
-    this._bus.$on("doc_mouse_up", this.undrag);
+    this._bus.$on("doc_mouse_up", this.doc_mouse_up);
+    this._bus.$on("resize", dr => (this.resizeDr = dr));
   },
-  computed:{
-
-  }
+  computed: {}
 };
 </script>
 

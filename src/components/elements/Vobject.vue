@@ -15,6 +15,7 @@
 </template>
 
 <script>
+// foreignObject兼容性差
 export default {
   name: "Vobject",
   props: {
