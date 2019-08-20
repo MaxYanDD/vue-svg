@@ -38,8 +38,8 @@ export default {
           type: "rect",
           width: 50,
           height: 50,
-          x: 0,
-          y: 0,
+          x: 5,
+          y: 5,
           rx: 5,
           ry: 5,
           fill: "red",
@@ -62,6 +62,21 @@ export default {
           strokeWidth: 0,
           transform: "",
           style: "cursor:move"
+        },{
+          name: "Vtext",
+          type: "rect",
+          x: 400,
+          y: 400,
+          width: 100,
+          height: 50,
+          rx: 0,
+          ry: 0,
+          fill: '#ccc',
+          stroke: "",
+          strokeWidth: 0,
+          transform: "",
+          style: "",
+          text:'哈哈哈'
         }
       ]
     };
