@@ -1,5 +1,8 @@
 export default {
-  lt: function({ imsX, imsY, nmsX, nmsY, x, y, width, height }) {
+  lt: function({ imsX, imsY, nmsX, nmsY, x, y, width, height,ratio }) {
+
+    let mvX = nmsX - imsX;
+    let mvY = ratio ? (nmsY - imsY) : (nmsY - imsY)
     x += nmsX - imsX;
     y += nmsY - imsY;
     width -= nmsX - imsX;
@@ -14,6 +17,7 @@ export default {
       y += height;
       height = Math.abs(height);
     }
+
     return {
       x,
       y,

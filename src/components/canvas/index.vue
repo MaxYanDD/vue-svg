@@ -16,70 +16,20 @@
         </template>
       </g>
       <!-- 辅助 -->
-      <template v-if="selectedIndex > -1">
-        <Hint :option.sync="elements[selectedIndex]" />
+      <template v-if="selectedIndex.length > 0">
+        <Hint v-for="id in selectedIndex" :option="elements[id]" :key="id" :id="id" />
       </template>
     </svg>
   </div>
 </template>
 
 <script>
-import Hint from "./Hint";
-import _reize from "../../utils/resize";
+import state from '../../store';
+import Hint from './Hint';
+import _reize from '../../utils/resize';
 export default {
   data() {
-    return {
-      svgH: 0,
-      selectedIndex: -1,
-      resizeDr: "",
-      elements: [
-        {
-          name: "Vrect",
-          type: "rect",
-          width: 50,
-          height: 50,
-          x: 5,
-          y: 5,
-          rx: 5,
-          ry: 5,
-          fill: "red",
-          stroke: "yellow",
-          strokeWidth: 10,
-          transform: "",
-          style: "cursor:move"
-        },
-        {
-          name: "Vrect",
-          type: "rect",
-          width: 100,
-          height: 200,
-          x: 100,
-          y: 100,
-          rx: 0,
-          ry: 0,
-          fill: "#ccc",
-          stroke: "yellow",
-          strokeWidth: 0,
-          transform: "",
-          style: "cursor:move"
-        },{
-          name: "Vtext",
-          type: "rect",
-          x: 400,
-          y: 400,
-          width: 100,
-          height: 50,
-          rx: 0,
-          ry: 0,
-          fill: '#ccc',
-          stroke: "",
-          strokeWidth: 0,
-          transform: "",
-          style: "",
-          text:'哈哈哈'
-        }
-      ]
-    };
+    return {};
   },
   components: { Hint },
   methods: {
@@ -89,96 +39,110 @@ export default {
 
       if (this.resizeDr) {
         this.resize(this.resizeDr);
-        this.updateSvgHeight()
         return;
       }
 
-      if (this.dragIndex > -1) {
+      if (this.dragIndex.length > 0) {
         this.drag();
         return;
       }
     },
     mouseDownHandler(down_e) {
       // 记录mousedown的初始位置
-      if (down_e.target == this.$refs["svg"]) {
-        this.selectedIndex = -1;
+      if (down_e.target == this.$refs['svg']) {
+        state.selectedIndex = [];
         return;
       }
-      this.dragIndex = this.selectedIndex;
-      const { x, y,width,height } = this.elements[this.dragIndex];
-      this.initX = x;
-      this.initY = y;
-      this.initW = width;
-      this.initH = height;
+
+      if(down_e.target.isContentEditable){ //如果是可编辑
+        return;
+      }
+
       this.initmsX = this.mousePosX;
       this.initmsY = this.mousePosY;
+
+      if (state.resizeID > -1) {
+        //记录reize元素初始尺寸
+        const { x, y, width, height } = state.elements[state.resizeID];
+        this.rsinitX = x;
+        this.rsinitY = y;
+        this.rsinitW = width;
+        this.rsinitH = height;
+        return;
+      }
+
+      this.dragIndex = state.selectedIndex;
+      this.dragInitPosArr = [];
+      this.dragIndex.forEach((id, index) => {
+        const { x, y } = state.elements[id];
+        this.dragInitPosArr.push({ x, y });
+      });
     },
     contextHandler() {},
     drag() {
-      let x = this.initX + this.mousePosX - this.initmsX;
-      let y = this.initY + this.mousePosY - this.initmsY;
-      this.$set(
-        this.elements,
-        this.dragIndex,
-        Object.assign({}, this.elements[this.dragIndex], { x, y })
-      );
-      this.updateSvgHeight();
+      this.dragIndex.forEach((id, index) => {
+        //todo
+        let x = this.dragInitPosArr[index].x + this.mousePosX - this.initmsX;
+        let y = this.dragInitPosArr[index].y + this.mousePosY - this.initmsY;
+        this.$set(state.elements, id, Object.assign({}, state.elements[id], { x, y }));
+      });
     },
     doc_mouse_up() {
       this.dragIndex = -1;
-      this.resizeDr = "";
-    },
-    changeIndex(index) {
-      this.selectedIndex = index;
+      state.resizeDr = '';
+      state.resizeID = -1;
     },
     setSvgHeight() {
       let max = 0;
-      this.elements.forEach(op => {
+      state.elements.forEach(op => {
         if (op.y + op.height + op.strokeWidth / 2 > max) {
           max = op.y + op.height + op.strokeWidth / 2;
         }
       });
-      this.svgH = max;
+      state.svgH = max;
     },
     updateSvgHeight() {
-      const { y, height, strokeWidth: strokeW } = this.elements[
-        this.dragIndex
-      ];
-      this.svgH =
-        y + height + strokeW / 2 > this.svgH
-          ? y + height + strokeW / 2
-          : this.svgH;
+      const { y, height, strokeWidth: strokeW } = state.elements[state.resizeID];
+      state.svgH = y + height + strokeW / 2 > state.svgH ? y + height + strokeW / 2 : state.svgH;
     },
     add() {
       // 更新svg的高度
       this.updateSvgHeight();
     },
     resize(dr) {
-      const { width, height } = this.elements[this.dragIndex];
+      const option  = state.elements[state.resizeID]
       let newOption = _reize[dr]({
         imsX: this.initmsX,
         imsY: this.initmsY,
         nmsX: this.mousePosX,
         nmsY: this.mousePosY,
-        x: this.initX,
-        y: this.initY,
-        width:this.initW,
-        height:this.initH
+        x: this.rsinitX,
+        y: this.rsinitY,
+        width: this.rsinitW,
+        height: this.rsinitH,
+        ratio: option.ratio || false
       });
-      this.$set(
-        this.elements,
-        this.dragIndex,
-        Object.assign({ ...this.elements[this.dragIndex] }, newOption)
-      );
+      this.$set(state.elements, state.resizeID, Object.assign({ ...option}, newOption));
     }
   },
   created() {
-    this.setSvgHeight();
-    this._bus.$on("changeIndex", this.changeIndex);
-    this._bus.$on("doc_mouse_up", this.doc_mouse_up);
-    this._bus.$on("resize", dr => (this.resizeDr = dr));
+    this.dragIndex = [];
+    this._bus.$on('doc_mouse_up', this.doc_mouse_up);
   },
-  computed: {}
+  computed: {
+    elements() {
+      return state.elements;
+    },
+    selectedIndex() {
+      return state.selectedIndex;
+    },
+    resizeDr() {
+      return state.resizeDr;
+    },
+    svgH() {
+      return state.svgH;
+    }
+  }
 };
 </script>
 
