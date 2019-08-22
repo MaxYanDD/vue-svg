@@ -21,16 +21,20 @@
         :y="option.y"
         :width="option.width"
         :height="option.height"
-        @mousedown="mouseDownHandler(false)"
+        @mousedown="mouseDownHandler"
         :style="`cursor:move;overflow:visible;`"
         pointer-events="all"
       >
-        <div style="width:100%;height:100%">
+        <div
+          :style="`width:100%;height:100%;box-sizing:border-box;;padding:5px;display:flex;justify-content: center;align-items: center;`"
+        >
           <p
             :contenteditable="isEditing"
-            :style="option.style+`;outline:none;cursor:text;`"
-            @mousedown.stop
-          >{{option.text}}</p>
+            :style="option.style+`;outline:none;cursor:text;-webkit-user-modify:read-write-plaintext-only;`"
+            @blur="updateHtml"
+            @mousedown="textMouseDown"
+            v-html="option.html"
+          ></p>
         </div>
       </foreignObject>
     </g>
@@ -39,7 +43,7 @@
 
 <script>
 export default {
-  name: 'Vtext',
+  name: "Vtext",
   props: {
     option: {
       type: Object
@@ -54,12 +58,17 @@ export default {
     };
   },
   methods: {
-    mouseDownHandler(value) {
-      if(value) {
-        return;
-      }else{
-        this._bus.$emit('changeIndex', this.index);
-      }
+    mouseDownHandler(e) {
+      this._bus.$emit("changeIndex", this.index);
+    },
+    updateHtml(e) {
+      this._bus.$emit("updateHtml", e.target.innerHTML, this.index);
+    },
+    focusHandler(e) {
+      this._bus.$emit("changeIndex", this.index);
+    },
+    textMouseDown() {
+      this.isEditing = true;
     }
   }
 };

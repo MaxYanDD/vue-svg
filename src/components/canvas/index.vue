@@ -32,6 +32,7 @@ export default {
       svgH: 0,
       selectedIndex: -1,
       resizeDr: "",
+      isTextEditing: false,
       elements: [
         {
           name: "Vrect",
@@ -65,9 +66,9 @@ export default {
         },{
           name: "Vtext",
           type: "rect",
-          x: 400,
-          y: 400,
-          width: 100,
+          x: 300,
+          y: 300,
+          width: 200,
           height: 50,
           rx: 0,
           ry: 0,
@@ -76,7 +77,7 @@ export default {
           strokeWidth: 0,
           transform: "",
           style: "",
-          text:'哈哈哈'
+          html:'单击此处添加文本'
         }
       ]
     };
@@ -104,6 +105,7 @@ export default {
         this.selectedIndex = -1;
         return;
       }
+      
       this.dragIndex = this.selectedIndex;
       const { x, y,width,height } = this.elements[this.dragIndex];
       this.initX = x;
@@ -170,12 +172,23 @@ export default {
         this.dragIndex,
         Object.assign({ ...this.elements[this.dragIndex] }, newOption)
       );
+    },
+    updateHtml(html,index){
+      if(!html){
+        this.deleteEl(index)
+        return;
+      }
+      this.elements[index].html = html 
+    },
+    deleteEl(index){
+      this.elements.splice(index,1);
     }
   },
   created() {
     this.setSvgHeight();
     this._bus.$on("changeIndex", this.changeIndex);
     this._bus.$on("doc_mouse_up", this.doc_mouse_up);
+    this._bus.$on("updateHtml", this.updateHtml);
     this._bus.$on("resize", dr => (this.resizeDr = dr));
   },
   computed: {}
