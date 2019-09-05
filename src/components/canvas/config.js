@@ -1,17 +1,17 @@
 // 样式
 
 export default {
-  // 改变大小可拖拽rect hint的默认样式
+  // hint圆点的默认样式
   rectHintEl: {
     name: 'Vrect',
     type: 'hint',
-    rx: 5,
-    ry: 5,
-    width: 10,
-    height: 10,
+    rx: 0,
+    ry: 0,
+    width: 6,
+    height: 6,
     fill: '#0072fb',
-    stroke: '#fff',
-    strokeWidth: '2',
+    stroke: 'rgba(0,0,0,0)',
+    strokeWidth: '8',
     transform: ''
   },
   rectHintStroke: {
@@ -25,5 +25,8 @@ export default {
     dasharray: '5,5',
     transform: '',
     style: 'pointer-events: none'
+  },
+  Page:{
+    
   }
 };

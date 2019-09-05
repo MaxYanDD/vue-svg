@@ -1,14 +1,13 @@
 <template>
   <div class="canvas">
     <svg
-      :height="svgH"
       @mousemove="mouseMoveHandler"
       @mousedown="mouseDownHandler"
       @contextmenu.prevent="contextHandler"
       ref="svg"
     >
       <!-- 背景 -->
-      <g />
+      <Page />
       <!-- 元素 -->
       <g>
         <template v-for="(ele,index) in elements">
@@ -26,23 +25,26 @@
 <script>
 import state from '../../store';
 import Hint from './Hint';
+import Page from './Page';
 import _reize from '../../utils/resize';
 export default {
   data() {
     return {};
   },
-  components: { Hint },
+  components: { Hint,Page },
   methods: {
     mouseMoveHandler(e) {
       this.mousePosX = e.clientX;
       this.mousePosY = e.clientY;
 
       if (this.resizeDr) {
+        state.showHitElmets = false;
         this.resize(this.resizeDr);
         return;
       }
 
       if (this.dragIndex.length > 0) {
+        state.showHitElmets = false;
         this.drag();
         return;
       }
@@ -91,10 +93,12 @@ export default {
       this.dragIndex = -1;
       state.resizeDr = '';
       state.resizeID = -1;
+      state.showHitElmets = true;
     },
     setSvgHeight() {
       let max = 0;
       state.elements.forEach(op => {
+
         if (op.y + op.height + op.strokeWidth / 2 > max) {
           max = op.y + op.height + op.strokeWidth / 2;
         }
@@ -110,8 +114,8 @@ export default {
       this.updateSvgHeight();
     },
     resize(dr) {
-      const option  = state.elements[state.resizeID]
-      let newOption = _reize[dr]({
+      const option  = state.elements[state.resizeID];
+      let {x,y,width,height} = _reize[dr]({
         imsX: this.initmsX,
         imsY: this.initmsY,
         nmsX: this.mousePosX,
@@ -120,9 +124,15 @@ export default {
         y: this.rsinitY,
         width: this.rsinitW,
         height: this.rsinitH,
-        ratio: option.ratio || false
+        ratio: option.keepratio ? option.ratio : false
       });
-      this.$set(state.elements, state.resizeID, Object.assign({ ...option}, newOption));
+      option.x = x;
+      option.y = y;
+      option.width = width;
+      option.height = height;
+    },
+    getCanvsSize(){
+      return this.refs['svg'].getBoundingClientRect();
     }
   },
   created() {
@@ -142,6 +152,10 @@ export default {
     svgH() {
       return state.svgH;
     }
+  },
+  mounted(){
+    const {width,height} = this.refs['svg'].getBoundingClientRect();
+    state.canvas = {};
   }
 };
 </script>
@@ -149,9 +163,11 @@ export default {
 <style lang="scss" scoped>
 .canvas {
   width: 100%;
-  border: 1px solid #ccc;
+  flex: 1;
+  overflow: hidden;
   svg {
     width: 100%;
+    height: 100%;
   }
 }
 </style>

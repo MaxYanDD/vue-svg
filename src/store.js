@@ -1,7 +1,9 @@
 import Vue from 'vue';
 
 const state = Vue.observable({
-  svgH: 500,
+  canvas: {
+  },
+  showHitElmets: true,
   selectedIndex: [],
   resizeDr: '',
   resizeID: -1,
@@ -51,8 +53,8 @@ const state = Vue.observable({
       strokeWidth: 0,
       transform: '',
       style: 'cursor:move',
-      src:'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3139953554,3011511497&fm=26&gp=0.jpg',
-      ratio:true
+      src:'http://litku.oss-cn-beijing.aliyuncs.com/images/2019/0619/42e3b48f5cb960046e9f94a44c892cab51204c65.jpg?x-oss-process=style/w320',
+      keepratio: true
     }
   ]
 });

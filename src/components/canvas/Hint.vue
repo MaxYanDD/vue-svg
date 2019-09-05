@@ -1,8 +1,10 @@
 <template>
   <g @mousedown="mouseDownHandler">
     <Vrect :option="hintStroke" />
-    <template v-for="(ele,index) in hintElments">
-      <component :is="ele.name" :key="index" :option="ele"></component>
+    <template v-if="showHitElmets">
+      <template v-for="(ele,index) in hintElments">
+        <component :is="ele.name" :key="index" :option="ele"></component>
+      </template>
     </template>
   </g>
 </template>
@@ -16,7 +18,8 @@ export default {
       //被选中的图像的option
       type: Object
     },
-    id: { //当前选中元素的index
+    id: {
+      //当前选中元素的index
       type: Number
     }
   },
@@ -114,6 +117,9 @@ export default {
       width += strokeWidth;
       height += strokeWidth;
       return Object.assign({}, defaultStyle, { x, y, width, height });
+    },
+    showHitElmets(){
+      return state.showHitElmets
     }
   },
   methods: {

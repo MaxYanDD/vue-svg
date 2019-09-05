@@ -54,13 +54,14 @@ export default {
       img.onload = () => {
         state.elements[this.index].width = img.width;
         state.elements[this.index].height = img.height;
+        state.elements[this.index].ratio = img.height / img.width;
         img = null;
       };
       img.src = this.option.src;
     }
   },
-  created(){
-    this.resizeImage()
+  created() {
+    this.resizeImage();
   }
 };
 </script>
