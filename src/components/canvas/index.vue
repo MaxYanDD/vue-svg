@@ -4,10 +4,11 @@
       @mousemove="mouseMoveHandler"
       @mousedown="mouseDownHandler"
       @contextmenu.prevent="contextHandler"
+      viewBox="0 0 3000 3000"
       ref="svg"
     >
       <!-- 背景 -->
-      <Page />
+      <Page v-if="canvasSize" :canvasSize="canvasSize"/>
       <!-- 元素 -->
       <g>
         <template v-for="(ele,index) in elements">
@@ -15,23 +16,25 @@
         </template>
       </g>
       <!-- 辅助 -->
-      <template v-if="selectedIndex.length > 0">
-        <Hint v-for="id in selectedIndex" :option="elements[id]" :key="id" :id="id" />
-      </template>
+      <g>
+        <template v-if="selectedIndex.length > 0">
+          <Hint v-for="id in selectedIndex" :option="elements[id]" :key="id" :id="id" />
+        </template>
+      </g>
     </svg>
   </div>
 </template>
 
 <script>
-import state from '../../store';
+import state from '@/store';
 import Hint from './Hint';
 import Page from './Page';
 import _reize from '../../utils/resize';
 export default {
   data() {
-    return {};
+    return {canvasSize:null};
   },
-  components: { Hint,Page },
+  components: { Hint, Page },
   methods: {
     mouseMoveHandler(e) {
       this.mousePosX = e.clientX;
@@ -56,7 +59,8 @@ export default {
         return;
       }
 
-      if(down_e.target.isContentEditable){ //如果是可编辑
+      if (down_e.target.isContentEditable) {
+        //如果是可编辑
         return;
       }
 
@@ -98,7 +102,6 @@ export default {
     setSvgHeight() {
       let max = 0;
       state.elements.forEach(op => {
-
         if (op.y + op.height + op.strokeWidth / 2 > max) {
           max = op.y + op.height + op.strokeWidth / 2;
         }
@@ -114,8 +117,8 @@ export default {
       this.updateSvgHeight();
     },
     resize(dr) {
-      const option  = state.elements[state.resizeID];
-      let {x,y,width,height} = _reize[dr]({
+      const option = state.elements[state.resizeID];
+      let { x, y, width, height } = _reize[dr]({
         imsX: this.initmsX,
         imsY: this.initmsY,
         nmsX: this.mousePosX,
@@ -131,9 +134,11 @@ export default {
       option.width = width;
       option.height = height;
     },
-    getCanvsSize(){
-      return this.refs['svg'].getBoundingClientRect();
-    }
+    getCanvsSize() {
+      if(!this.$refs['svg']) return;
+      this.canvasSize = this.$refs['svg'].getBoundingClientRect();
+    },
+
   },
   created() {
     this.dragIndex = [];
@@ -153,9 +158,9 @@ export default {
       return state.svgH;
     }
   },
-  mounted(){
-    const {width,height} = this.refs['svg'].getBoundingClientRect();
-    state.canvas = {};
+  mounted() {
+    this.getCanvsSize();
+    window.addEventListener('resize',this.getCanvsSize)
   }
 };
 </script>
@@ -165,6 +170,7 @@ export default {
   width: 100%;
   flex: 1;
   overflow: hidden;
+  background-color: #f1f1f1;
   svg {
     width: 100%;
     height: 100%;

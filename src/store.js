@@ -1,8 +1,7 @@
 import Vue from 'vue';
 
 const state = Vue.observable({
-  canvas: {
-  },
+  pageSize: null,
   showHitElmets: true,
   selectedIndex: [],
   resizeDr: '',
