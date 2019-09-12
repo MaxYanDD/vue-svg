@@ -1,7 +1,10 @@
+import state from '../store'
+
+let scale = state.pageScale;
 export default {
   lt: function({ imsX, imsY, nmsX, nmsY, x, y, width, height, ratio }) {
-    let disX = nmsX - imsX;
-    let disY = ratio ? Math.floor(disX * ratio) : nmsY - imsY;
+    let disX = (nmsX - imsX)/scale ;
+    let disY = (ratio ? Math.floor(disX * ratio) : (nmsY - imsY)/scale);
 
     x += disX;
     y += disY;
@@ -26,14 +29,14 @@ export default {
     };
   },
   ct: function({ imsX, imsY, nmsX, nmsY, x, y, width, height, ratio }) {
-    let disY = nmsY - imsY;
+    let disY = (nmsY - imsY)/scale;
     let disX = ratio ? Math.floor(disY / ratio) : 0;
 
     x += Math.floor(disX / 2);
     width -= disX;
 
-    y += nmsY - imsY;
-    height -= nmsY - imsY;
+    y += disY;
+    height -= disY;
 
     if (height < 0) {
       y += height;
@@ -47,8 +50,8 @@ export default {
     };
   },
   rt: function({ imsX, imsY, nmsX, nmsY, x, y, width, height, ratio }) {
-    let disX = nmsX - imsX;
-    let disY = ratio ? Math.floor(-disX * ratio) : nmsY - imsY;
+    let disX = (nmsX - imsX)/scale;
+    let disY = ratio ? Math.floor(-disX * ratio) : (nmsY - imsY)/scale;
 
     width += disX;
     y += disY;
@@ -72,7 +75,7 @@ export default {
     };
   },
   lm: function({ imsX, imsY, nmsX, nmsY, x, y, width, height, ratio }) {
-    let disX = nmsX - imsX;
+    let disX = (nmsX - imsX)/scale;
     let disY = ratio ? Math.floor(disX * ratio) : 0;
 
     x += disX;
@@ -98,7 +101,7 @@ export default {
     };
   },
   rm: function({ imsX, imsY, nmsX, nmsY, x, y, width, height, ratio }) {
-    let disX = nmsX - imsX;
+    let disX = (nmsX - imsX)/scale;
     let disY = ratio ? Math.floor(-disX * ratio) : 0;
 
     width += disX;
@@ -123,8 +126,8 @@ export default {
     };
   },
   lb: function({ imsX, imsY, nmsX, nmsY, x, y, width, height, ratio }) {
-    let disX = nmsX - imsX;
-    let disY = ratio ? Math.floor(-disX * ratio) : nmsY - imsY;
+    let disX = (nmsX - imsX)/scale;
+    let disY = ratio ? Math.floor(-disX * ratio) : (nmsY - imsY)/scale;
 
     height += disY;
     x += disX;
@@ -148,7 +151,7 @@ export default {
     };
   },
   cb: function({ imsX, imsY, nmsX, nmsY, x, y, width, height, ratio }) {
-    let disY = nmsY - imsY;
+    let disY = (nmsY - imsY)/scale;
     let disX = ratio ? Math.floor(-disY / ratio) : 0;
 
     height += disY;
@@ -168,8 +171,8 @@ export default {
   },
   // 右下resize
   rb: function({ imsX, imsY, nmsX, nmsY, x, y, width, height, ratio }) {
-    let disX = nmsX - imsX;
-    let disY = ratio ? Math.floor(disX * ratio) : nmsY - imsY;
+    let disX = (nmsX - imsX)/scale;
+    let disY = ratio ? Math.floor(disX * ratio) : (nmsY - imsY)/scale;
 
     width += disX;
     height += disY;

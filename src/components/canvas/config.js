@@ -27,7 +27,7 @@ export default {
     style: 'pointer-events: none'
   },
   pageSize:{
-    width: 1655,
-    height:1170
+    width: 400,
+    height:200
   }
 };

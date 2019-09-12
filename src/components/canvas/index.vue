@@ -4,22 +4,25 @@
       @mousemove="mouseMoveHandler"
       @mousedown="mouseDownHandler"
       @contextmenu.prevent="contextHandler"
-      viewBox="0 0 3000 3000"
       ref="svg"
+      :viewBox="viewBox"
+      preserveAspectRatio = "xMinYMin slice"
     >
-      <!-- 背景 -->
-      <Page v-if="canvasSize" :canvasSize="canvasSize"/>
-      <!-- 元素 -->
-      <g>
-        <template v-for="(ele,index) in elements">
-          <component :is="ele.name" :option="ele" :index="index" :key="index" />
-        </template>
-      </g>
-      <!-- 辅助 -->
-      <g>
-        <template v-if="selectedIndex.length > 0">
-          <Hint v-for="id in selectedIndex" :option="elements[id]" :key="id" :id="id" />
-        </template>
+      <g transform="">
+        <!-- 背景 -->
+        <Page v-if="canvasSize"  />
+        <!-- 元素 -->
+        <g>
+          <template v-for="(ele,index) in elements">
+            <component :is="ele.name" :option="ele" :index="index" :key="index" />
+          </template>
+        </g>
+        <!-- 辅助 -->
+        <g>
+          <template v-if="selectedIndex.length > 0">
+            <Hint v-for="id in selectedIndex" :option="elements[id]" :key="id" :id="id" />
+          </template>
+        </g>
       </g>
     </svg>
   </div>
@@ -29,10 +32,12 @@
 import state from '@/store';
 import Hint from './Hint';
 import Page from './Page';
-import _reize from '../../utils/resize';
+import _reize from '@/utils/resize';
+import config from './config'
+
 export default {
   data() {
-    return {canvasSize:null};
+    return { canvasSize: null };
   },
   components: { Hint, Page },
   methods: {
@@ -88,9 +93,11 @@ export default {
     drag() {
       this.dragIndex.forEach((id, index) => {
         //todo
-        let x = this.dragInitPosArr[index].x + this.mousePosX - this.initmsX;
-        let y = this.dragInitPosArr[index].y + this.mousePosY - this.initmsY;
-        this.$set(state.elements, id, Object.assign({}, state.elements[id], { x, y }));
+        let x = this.dragInitPosArr[index].x + (this.mousePosX - this.initmsX)/this.pageScale;
+        let y = this.dragInitPosArr[index].y + (this.mousePosY - this.initmsY)/this.pageScale;
+ 
+        state.elements[id].x = Math.floor(x);
+        state.elements[id].y = Math.floor(y);
       });
     },
     doc_mouse_up() {
@@ -134,11 +141,18 @@ export default {
       option.width = width;
       option.height = height;
     },
-    getCanvsSize() {
-      if(!this.$refs['svg']) return;
+    setPage() {
+      if (!this.$refs['svg']) return;
       this.canvasSize = this.$refs['svg'].getBoundingClientRect();
-    },
-
+      const {width,height} = config.pageSize;
+      const {width:cvw,height:cvh} = this.canvasSize;
+      state.pageSize = {
+        x: Math.floor((cvw-width)/2),
+        y:  Math.floor((cvh-height)/2),
+        width,
+        height,
+      }
+    }
   },
   created() {
     this.dragIndex = [];
@@ -156,11 +170,23 @@ export default {
     },
     svgH() {
       return state.svgH;
+    },
+    pageScale(){
+      return state.pageScale
+    },
+    viewBox(){
+      if(!this.canvasSize || this.pageScale == 1) return;
+      const {width,height} = this.canvasSize;
+      const newWidth = width/this.pageScale;
+      const newHeight = height/this.pageScale;
+      const disX = (newWidth - width)/2;
+      const disY = (newHeight - height)/2;
+      return `${-disX},${-disY},${newWidth},${newHeight}`
     }
   },
   mounted() {
-    this.getCanvsSize();
-    window.addEventListener('resize',this.getCanvsSize)
+    this.setPage();
+    window.addEventListener('resize', this.setPage);
   }
 };
 </script>

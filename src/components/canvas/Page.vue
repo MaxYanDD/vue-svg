@@ -1,5 +1,5 @@
 <template>
-  <g pointer-events="none">
+  <g pointer-events="none" style="">
     <rect
       :x="option.x"
       :y="option.y"
@@ -15,24 +15,15 @@ import config from './config'
 import state from '@/store';
 
 export default {
-  props:['canvasSize'],
   name: 'Page',
   data() {
     return {
-      pageConfig: config.pageSize
     }
   },
   computed: {
     option(){
-      const {width,height} = this.pageConfig;
-      const {width:cvw,height:cvh} = this.canvasSize;
-      return {
-        x: Math.floor((cvw-width)/2),
-        y:  Math.floor((cvh-height)/2),
-        width,
-        height,
-      };
-    }
+      return state.pageSize;
+    },
   },
 };
 </script>

@@ -33,7 +33,8 @@ export default {
       if (this.option.type == 'rect') {
         //计算出rect类型的hint
         let { x, y, width: rw, height: rh, strokeWidth: rsw } = this.option;
-        const { width: w, height: h } = defaultStyle;
+        let { width: w, height: h } = defaultStyle;
+        
         if (!rsw) rsw = 0;
         const l = x - w / 2 - rsw / 2,
           c = x + rw / 2 - w / 2,
@@ -41,12 +42,16 @@ export default {
         const t = y - h / 2 - rsw / 2,
           m = y + rh / 2 - h / 2,
           b = y + rh - h / 2 + rsw / 2;
+
+        defaultStyle.width = w/this.pageScale;
+        defaultStyle.height = h/this.pageScale;
+        defaultStyle.strokeWidth = defaultStyle.strokeWidth/this.pageScale;
         elarr.push(
           Object.assign({}, defaultStyle, {
             x: l,
             y: t,
             dr: 'lt',
-            style: 'cursor: nw-resize;'
+            style: `cursor: nw-resize; `
           })
         ); //左上
         elarr.push(
@@ -120,6 +125,9 @@ export default {
     },
     showHitElmets(){
       return state.showHitElmets
+    },
+    pageScale(){
+      return state.pageScale
     }
   },
   methods: {
