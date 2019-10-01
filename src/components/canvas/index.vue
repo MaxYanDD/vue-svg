@@ -1,7 +1,6 @@
 <template>
   <div class="canvas">
     <svg
-      @mousemove="mouseMoveHandler"
       @mousedown="mouseDownHandler"
       @contextmenu.prevent="contextHandler"
       ref="svg"
@@ -42,6 +41,7 @@ export default {
   components: { Hint, Page },
   methods: {
     mouseMoveHandler(e) {
+      console.log(e);
       this.mousePosX = e.clientX;
       this.mousePosY = e.clientY;
 
@@ -88,6 +88,8 @@ export default {
         const { x, y } = state.elements[id];
         this.dragInitPosArr.push({ x, y });
       });
+
+      this.$refs['svg'].addEventListener('mousemove', this.mouseMoveHandler)
     },
     contextHandler() {},
     drag() {
@@ -101,6 +103,7 @@ export default {
       });
     },
     doc_mouse_up() {
+      this.$refs['svg'].removeEventListener('mousemove', this.mouseMoveHandler)
       this.dragIndex = -1;
       state.resizeDr = '';
       state.resizeID = -1;

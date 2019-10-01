@@ -37,7 +37,7 @@ const state = Vue.observable({
       strokeWidth: 0,
       transform: '',
       style: '',
-      html: '哈哈哈'
+      html: '可编辑文本'
     },
     {
       name: 'Vimage',
